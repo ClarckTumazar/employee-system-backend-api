@@ -21,7 +21,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public Employee createEmployee(Employee employee) {
-    EmployeeEnitity employeeEnitity = new EmployeeEnitity();
+    EmployeeEnitity employeeEnitity 
+        = new EmployeeEnitity();
 
     BeanUtils.copyProperties(employee, employeeEnitity);
     employeeRepository.save(employeeEnitity);
@@ -31,18 +32,49 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   public List<Employee> getAllEmployees() {
-    List<EmployeeEnitity> employeeEnitities = employeeRepository.findAll();
+    List<EmployeeEnitity> employeeEnitities
+        = employeeRepository.findAll();
 
     List<Employee> employees = employeeEnitities
         .stream()
         .map(emp -> new Employee(
             emp.getId(),
-            emp.getEmailId(),
             emp.getFirstName(),
-            emp.getLastName()))
+            emp.getLastName(),
+            emp.getEmailId()))
         .collect(Collectors.toList());
 
     return employees;
+  }
+
+  @Override
+  public boolean deleteEmployee(Long id) {
+    EmployeeEnitity employee 
+        = employeeRepository.findById(id).get(); 
+    employeeRepository.delete(employee);
+    return true;
+  }
+
+  @Override
+  public Employee getEmployeeById(Long id) {
+    EmployeeEnitity employeeEnitity
+        = employeeRepository.findById(id).get();
+    Employee employee = new Employee();
+    BeanUtils.copyProperties(employeeEnitity, employee);
+    return employee;
+  }
+
+  @Override
+  public Employee updateEmployee(Long id, Employee employee) {
+    EmployeeEnitity employeeEnitity 
+        = employeeRepository.findById(id).get();
+
+    employeeEnitity.setEmailId(employee.getEmailId());
+    employeeEnitity.setFirstName(employee.getFirstName());
+    employeeEnitity.setLastName(employee.getLastName());
+
+    employeeRepository.save(employeeEnitity);
+    return employee;
   }
 
 }
